@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<ApplicationDBContext>();
+builder.Services.AddSqlServer<ApplicationDBContext>(builder.Configuration["ConnectionStrings:Default"]);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -13,79 +13,92 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+List<string> products = new List<string>(
+ ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"]
+);
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/products", (ApplicationDBContext context) =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+  return Results.Ok(context.Products
+    .Include(p => p.Category)
+    .Include(p => p.Tags)
+    .ToList());
+});
+// .WithName("GetWeatherForecast")
+// .WithOpenApi();
+
+app.MapGet("/products/{id}", (int id, ApplicationDBContext context) =>
+{
+  Product? product = context.Products
+    .Include(p => p.Category)
+    .Include(p => p.Tags)
+    .Where(p => p.Id == id)
+    .FirstOrDefault();
+  return product != null ? Results.Ok(product) : Results.BadRequest("Product not found");
+});
+
+app.MapPost("/products", (ProductDTO product, ApplicationDBContext context) =>
+{
+  Category? category = context.Categories.Where(c => c.Id == product.CategoryId).FirstOrDefault<Category>();
+  if (category == null) return Results.BadRequest("Category invalid");
+  Product productDb = new Product()
+  {
+    Code = product.Code,
+    Name = product.Name,
+    Description = product.Description,
+    Category = category
+  };
+  if (product.Tags != null)
+  {
+    productDb.Tags = new List<Tag>();
+    foreach (string item in product.Tags)
+    {
+      productDb.Tags.Add(new Tag { Name = item });
+    }
+  }
+  context.Products.Add(productDb);
+  context.SaveChanges();
+  return Results.Created();
+});
+
+app.MapPut("/products/{id}", (ProductDTO product, int id, ApplicationDBContext context) =>
+{
+  Product? productDb = context.Products
+    .Include(p => p.Tags)
+    .Where(p => p.Id == id)
+    .FirstOrDefault();
+  if (productDb == null) return Results.BadRequest("Product not found");
+
+  Category? category = context.Categories.Where(c => c.Id == product.CategoryId).FirstOrDefault<Category>();
+  if (category == null) return Results.BadRequest("Category invalid");
+
+  productDb.Code = product.Code;
+  productDb.Name = product.Name;
+  productDb.Description = product.Description;
+  productDb.Category = category;
+  productDb.Tags = new List<Tag>();
+  if (product.Tags != null)
+  {
+    foreach (string item in product.Tags)
+    {
+      productDb.Tags.Add(new Tag { Name = item });
+    }
+  }
+  context.SaveChanges();
+  return Results.Ok();
+});
+
+app.MapDelete("/products/{id}", (int id, ApplicationDBContext context) =>
+{
+  Product? productDb = context.Products
+    .Where(p => p.Id == id)
+    .FirstOrDefault();
+  if (productDb == null) return Results.BadRequest("Product not found");
+
+  context.Products.Remove(productDb);  
+  context.SaveChanges();
+  return Results.Ok();
+  
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-
-public partial class Category
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-}
-
-public partial class Tag
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public int ProductId { get; set; }
-}
-
-public partial class Product
-{
-    public int Id { get; set; }
-    public string Code { get; set; }
-    public string Name { get; set; }
-    public string? Description { get; set; }
-    public Category Category { get; set; }
-    public List<Tag> Tags { get; set; }
-}
-
-public class ApplicationDBContext : DbContext
-{
-
-    public DbSet<Product> Products { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer("Server=localhost; Database=Products; Trusted_Connection=true; TrustServerCertificate=true");
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.HasDefaultSchema("MySchema");
-
-        modelBuilder.Entity<Product>()
-        .Property(p=> p.Description).HasMaxLength(200);
-        modelBuilder.Entity<Product>()
-        .Property(p=> p.Code).HasMaxLength(20);
-        modelBuilder.Entity<Product>()
-        .Property(p=> p.Name).HasMaxLength(100);
-    }
-    
-    
-  
-
-}
