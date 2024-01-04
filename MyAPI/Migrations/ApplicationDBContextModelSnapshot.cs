@@ -31,11 +31,12 @@ namespace MyAPI.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category", "MySchema");
+                    b.ToTable("Categories", "MySchema");
                 });
 
             modelBuilder.Entity("Product", b =>
@@ -80,7 +81,8 @@ namespace MyAPI.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -89,7 +91,7 @@ namespace MyAPI.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Tag", "MySchema");
+                    b.ToTable("Tags", "MySchema");
                 });
 
             modelBuilder.Entity("Product", b =>

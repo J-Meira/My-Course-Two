@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MyAPI.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240103194646_AddCategory")]
-    partial class AddCategory
+    [Migration("20240104124836_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,11 +34,12 @@ namespace MyAPI.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category", "MySchema");
+                    b.ToTable("Categories", "MySchema");
                 });
 
             modelBuilder.Entity("Product", b =>
@@ -73,6 +74,29 @@ namespace MyAPI.Migrations
                     b.ToTable("Products", "MySchema");
                 });
 
+            modelBuilder.Entity("Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Tags", "MySchema");
+                });
+
             modelBuilder.Entity("Product", b =>
                 {
                     b.HasOne("Category", "Category")
@@ -82,6 +106,20 @@ namespace MyAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Tag", b =>
+                {
+                    b.HasOne("Product", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }
