@@ -3,11 +3,9 @@ using Flunt.Notifications;
 namespace MyAPI.Entities;
 
 public abstract class EntityDTO : Notifiable<Notification>
-{
-  public Dictionary<string, string[]> HandleErrors(IReadOnlyCollection<Notification> notifications)
+{  
+  public string[] HandleErrors()
   {
-    return notifications
-      .GroupBy(g => g.Key)
-      .ToDictionary(g => g.Key, g => g.Select(x => x.Message).ToArray());
+    return Notifications.Select(x => x.Message).ToArray();
   }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.Entities;
 using MyAPI.Entities.Categories;
 
 namespace MyAPI.Controllers;
@@ -20,7 +21,7 @@ public class CategoryController : ControllerBase
     return _categoryRepository.GetAll();
   }
 
-  [HttpGet("GetById/{id}")]
+  [HttpGet("GetById/{id:guid}")]
   public IActionResult GetById(Guid id)
   {
     CategoryRDTO ? category =  _categoryRepository.GetById(id);
@@ -32,24 +33,28 @@ public class CategoryController : ControllerBase
   {
     if(!entity.IsValid)
     {
-      return BadRequest(entity.HandleErrors(entity.Notifications));
+      return BadRequest(new ErrorRDTO(entity.HandleErrors()));
     }
     return _categoryRepository.AddEntity(entity) ? Created() : BadRequest();
   }
 
-  [HttpPut("UpdateById/{id}")]
+  [HttpPut("UpdateById/{id:guid}")]
   public IActionResult UpdateById(CategoryDTO entity, Guid id)
   {
+    if(!entity.IsValid)
+    {
+      return BadRequest(entity.HandleErrors());
+    }
     return _categoryRepository.UpdateEntity(id, entity) ? Ok() : BadRequest();
   }
 
-  [HttpPut("Active/{id}/{status}")]
-  public IActionResult Active(Guid id, bool status)
+  [HttpPut("Activate/{id:guid}/{status:bool}")]
+  public IActionResult Activate(Guid id, bool status)
   {
-    return _categoryRepository.ActiveEntity(id, status) ? Ok() : BadRequest();
+    return _categoryRepository.ActivateEntity(id, status) ? Ok() : BadRequest();
   }
 
-  [HttpDelete("DeleteById/{id}")]
+  [HttpDelete("DeleteById/{id:guid}")]
   public IActionResult DeleteById(Guid id)
   {
     return _categoryRepository.RemoveEntity(id) ? Ok() : BadRequest();

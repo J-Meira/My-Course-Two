@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace MyAPI.Entities.Categories;
 
-public class CategoryRepository :ICategoryRepository
+public class CategoryRepository : ICategoryRepository
 {
   private readonly AppDbContext _context;
-  
+
   public CategoryRepository(AppDbContext context)
   {
     _context = context;
@@ -20,7 +20,6 @@ public class CategoryRepository :ICategoryRepository
       CreatedAt = DateTime.Now,
       UpdatedBy = "Sys",
       UpdatedAt = DateTime.Now,
-
     };
     _context.Categories.Add(category);
     return _context.SaveChanges() > 0;
@@ -42,13 +41,12 @@ public class CategoryRepository :ICategoryRepository
     {
       return false;
     }
-    dbEntity.Name = entity.Name;
-    dbEntity.UpdatedAt = DateTime.Now;
+    dbEntity.Update(entity.Name, "Sys");
     return _context.SaveChanges() > 0;
   }
   public CategoryRDTO? GetById(Guid id)
   {
-    Category ? entity = _context.Categories.Where(x => x.Id == id).FirstOrDefault();
+    Category? entity = _context.Categories.Where(x => x.Id == id).FirstOrDefault();
     return entity != null ? new CategoryRDTO()
     {
       Id = entity.Id,
@@ -62,15 +60,14 @@ public class CategoryRepository :ICategoryRepository
     IEnumerable<Category> list = _context.Categories.ToList();
     return list.Select(c => new CategoryRDTO { Id = c.Id, Name = c.Name, Active = c.Active });
   }
-  public bool ActiveEntity(Guid id, bool status)
+  public bool ActivateEntity(Guid id, bool status)
   {
     Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
     if (dbEntity == null)
     {
       return false;
     }
-    dbEntity.Active = status;
-    dbEntity.UpdatedAt = DateTime.Now;
+    dbEntity.Activate(status, "sys");
     return _context.SaveChanges() > 0;
   }
 }
