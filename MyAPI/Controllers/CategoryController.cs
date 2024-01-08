@@ -8,23 +8,23 @@ namespace MyAPI.Controllers;
 [ApiController]
 public class CategoryController : ControllerBase
 {
-  private ICategoryRepository _categoryRepository;
+  private ICategoryRepository _repository;
 
-  public CategoryController(ICategoryRepository categoryRepository)
+  public CategoryController(ICategoryRepository repository)
   {
-    _categoryRepository = categoryRepository;
+    _repository = repository;
   }
 
   [HttpGet("GetAll")]
   public IEnumerable<CategoryRDTO> GetAll()
   {
-    return _categoryRepository.GetAll();
+    return _repository.GetAll();
   }
 
   [HttpGet("GetById/{id:guid}")]
   public IActionResult GetById(Guid id)
   {
-    CategoryRDTO ? category =  _categoryRepository.GetById(id);
+    CategoryRDTO ? category =  _repository.GetById(id);
     return category == null ? BadRequest() : Ok(category);
   }
 
@@ -33,9 +33,9 @@ public class CategoryController : ControllerBase
   {
     if(!entity.IsValid)
     {
-      return BadRequest(new ErrorRDTO(entity.HandleErrors()));
+      return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
     }
-    return _categoryRepository.AddEntity(entity) ? Created() : BadRequest();
+    return _repository.AddEntity(entity) ? Created() : BadRequest();
   }
 
   [HttpPut("UpdateById/{id:guid}")]
@@ -45,18 +45,18 @@ public class CategoryController : ControllerBase
     {
       return BadRequest(entity.HandleErrors());
     }
-    return _categoryRepository.UpdateEntity(id, entity) ? Ok() : BadRequest();
+    return _repository.UpdateEntity(id, entity) ? Ok() : BadRequest();
   }
 
   [HttpPut("Activate/{id:guid}/{status:bool}")]
   public IActionResult Activate(Guid id, bool status)
   {
-    return _categoryRepository.ActivateEntity(id, status) ? Ok() : BadRequest();
+    return _repository.ActivateEntity(id, status) ? Ok() : BadRequest();
   }
 
   [HttpDelete("DeleteById/{id:guid}")]
   public IActionResult DeleteById(Guid id)
   {
-    return _categoryRepository.RemoveEntity(id) ? Ok() : BadRequest();
+    return _repository.RemoveEntity(id) ? Ok() : BadRequest();
   }
 }

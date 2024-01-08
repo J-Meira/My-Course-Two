@@ -1,9 +1,10 @@
 namespace MyAPI.Entities.Employees;
 
-public record EmployeeRDTO
-(
-  string Id,
-  string? Name,
-  string Email,
-  string? Registration
-);
+public partial class EmployeeRDTO
+{
+  public Guid Id { get; set; }
+  public string Name {get; set;}
+  public string Email {get; set;}
+  public string Registration {get; set;}
+  public bool Active {get; set;}
+}

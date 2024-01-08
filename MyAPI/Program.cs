@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using MyAPI.Entities.Categories;
+using MyAPI.Entities.Employees;
 using MyAPI.Infra.DataBase;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 var app = builder.Build();
 

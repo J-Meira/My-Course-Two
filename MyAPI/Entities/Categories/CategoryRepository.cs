@@ -1,5 +1,4 @@
 using MyAPI.Infra.DataBase;
-using System.Collections.Generic;
 
 namespace MyAPI.Entities.Categories;
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.Entities.Categories;
+using MyAPI.Entities.Employees;
 using MyAPI.Entities.Products;
 
 namespace MyAPI.Infra.DataBase;
@@ -11,6 +12,8 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
 {
   public DbSet<Product> Products { get; set; }
   public DbSet<Category> Categories { get; set; }
+
+  public DbSet<Employee> Employees { get; set; }
 
   public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
