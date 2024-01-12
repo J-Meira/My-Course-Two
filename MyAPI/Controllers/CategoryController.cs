@@ -1,11 +1,14 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Entities;
 using MyAPI.Entities.Categories;
+using System.Security.Claims;
 
 namespace MyAPI.Controllers;
-[Route("api/[controller]")]
+
+[Authorize]
 [ApiController]
+[Route("api/[controller]")]
 public class CategoryController : ControllerBase
 {
   private ICategoryRepository _repository;
@@ -15,6 +18,7 @@ public class CategoryController : ControllerBase
     _repository = repository;
   }
 
+  [AllowAnonymous]
   [HttpGet("GetAll")]
   public IEnumerable<CategoryRDTO> GetAll()
   {
@@ -31,11 +35,19 @@ public class CategoryController : ControllerBase
   [HttpPost("Add")]
   public IActionResult Add(CategoryDTO entity)
   {
-    if(!entity.IsValid)
+    if (int.TryParse(this.User
+        .FindFirstValue("userId"), out int userId))
     {
-      return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
+      if (!entity.IsValid)
+      {
+        return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
+      }
+      return _repository.AddEntity(entity) ? Created() : BadRequest();
     }
-    return _repository.AddEntity(entity) ? Created() : BadRequest();
+    else
+    {
+      return BadRequest();
+    }
   }
 
   [HttpPut("UpdateById/{id:guid}")]

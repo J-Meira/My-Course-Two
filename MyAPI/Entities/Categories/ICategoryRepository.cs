@@ -2,10 +2,10 @@ namespace MyAPI.Entities.Categories;
 
 public interface ICategoryRepository
 {
-  public bool AddEntity(CategoryDTO entity);
-  public bool RemoveEntity(Guid id);
-  public bool UpdateEntity(Guid id, CategoryDTO entity);
-  public bool ActivateEntity(Guid id, bool status);
+  public RepositoryTaskResult AddEntity(CategoryDTO entity, string userId);
+  public RepositoryTaskResult RemoveEntity(Guid id, string userId);
+  public RepositoryTaskResult UpdateEntity(Guid id, CategoryDTO entity, string userId);
+  public RepositoryTaskResult ActivateEntity(Guid id, bool status, string userId);
   public CategoryRDTO? GetById(Guid id);
   public IEnumerable<CategoryRDTO> GetAll();
 }

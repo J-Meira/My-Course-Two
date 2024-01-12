@@ -10,38 +10,67 @@ public class CategoryRepository : ICategoryRepository
   {
     _context = context;
   }
-  public bool AddEntity(CategoryDTO entity)
+  public RepositoryTaskResult AddEntity(CategoryDTO entity, string userId)
   {
-    Category category = new Category()
+    Category category = new()
     {
       Name = entity.Name,
-      CreatedBy = "Sys",
+      CreatedBy = userId,
       CreatedAt = DateTime.Now,
-      UpdatedBy = "Sys",
+      UpdatedBy = userId,
       UpdatedAt = DateTime.Now,
     };
     _context.Categories.Add(category);
-    return _context.SaveChanges() > 0;
+
+    int resultSave = _context.SaveChanges();
+
+    return new RepositoryTaskResult
+    {
+      Success = resultSave > 0,
+      Errors = null
+    };
   }
-  public bool RemoveEntity(Guid id)
+  public RepositoryTaskResult RemoveEntity(Guid id, string userId)
   {
     Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
     if (dbEntity == null)
     {
-      return false;
+      return new RepositoryTaskResult
+      {
+        Success = false,
+        Errors = new ErrorsRDTO(new List<string>(["Category nout found"]))
+      };
     }
     _context.Categories.Remove(dbEntity);
-    return _context.SaveChanges() > 0;
+
+    int resultSave = _context.SaveChanges();
+
+    return new RepositoryTaskResult
+    {
+      Success = resultSave > 0,
+      Errors = null
+    };
   }
-  public bool UpdateEntity(Guid id, CategoryDTO entity)
+  public RepositoryTaskResult UpdateEntity(Guid id, CategoryDTO entity, string userId)
   {
     Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
     if (dbEntity == null)
     {
-      return false;
+      return new RepositoryTaskResult
+      {
+        Success = false,
+        Errors = new ErrorsRDTO(new List<string>(["Category nout found"]))
+      };
     }
     dbEntity.Update(entity.Name, "Sys");
-    return _context.SaveChanges() > 0;
+
+    int resultSave = _context.SaveChanges();
+
+    return new RepositoryTaskResult
+    {
+      Success = resultSave > 0,
+      Errors = null
+    };
   }
   public CategoryRDTO? GetById(Guid id)
   {
@@ -59,14 +88,24 @@ public class CategoryRepository : ICategoryRepository
     IEnumerable<Category> list = _context.Categories.ToList();
     return list.Select(c => new CategoryRDTO { Id = c.Id, Name = c.Name, Active = c.Active });
   }
-  public bool ActivateEntity(Guid id, bool status)
+  public RepositoryTaskResult ActivateEntity(Guid id, bool status, string userId)
   {
     Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
     if (dbEntity == null)
     {
-      return false;
+      return new RepositoryTaskResult
+      {
+        Success = false,
+        Errors = new ErrorsRDTO(new List<string>(["Category nout found"]))
+      };
     }
-    dbEntity.Activate(status, "sys");
-    return _context.SaveChanges() > 0;
+    dbEntity.Activate(status, userId);
+    int resultSave = _context.SaveChanges();
+
+    return new RepositoryTaskResult
+    {
+      Success = resultSave > 0,
+      Errors = null
+    };
   }
 }
