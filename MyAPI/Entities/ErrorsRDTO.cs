@@ -8,6 +8,10 @@ public class ErrorsRDTO
   {
     Errors = errors;
   }
+  public ErrorsRDTO(string error)
+  {
+    Errors =  new List<string>() { error };
+  }
 }
 
 

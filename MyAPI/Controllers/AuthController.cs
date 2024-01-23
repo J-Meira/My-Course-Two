@@ -36,27 +36,27 @@ public class AuthController : ControllerBase
     IdentityUser? user = _userManager.FindByEmailAsync(entity.Email).Result;
     if (user == null)
     {
-      return BadRequest(new ErrorsRDTO(new List<string>(["Email or password are invalid"])));
+      return BadRequest(new ErrorsRDTO("Email or password are invalid"));
     }
     if (!_userManager.CheckPasswordAsync(user, entity.Password).Result)
     {
-      return BadRequest(new ErrorsRDTO(new List<string>(["Email or password are invalid"])));
+      return BadRequest(new ErrorsRDTO("Email or password are invalid"));
     }
 
     EmployeeRDTO? employee = _repository.GetByUserId(user.Id);
 
     if (employee == null || employee.Active == false)
     {
-      return BadRequest(new ErrorsRDTO(new List<string>(["User inactive"])));
+      return BadRequest(new ErrorsRDTO("User inactive"));
     }
 
     var claims = new Claim[]
     {
       new Claim("userId", user.Id),
       new Claim("userName", employee.Name),
-      new Claim("userRegistration", employee.Registration),
+      new Claim("employeeRegistration", employee.Registration),
     };
-    DateTime expires = DateTime.UtcNow.AddMinutes(2);
+    DateTime expires = DateTime.UtcNow.AddDays(1);
 
     string token = _authHelper
       .CreateToken(claims,expires);

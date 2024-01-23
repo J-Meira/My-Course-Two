@@ -9,7 +9,10 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSqlServer<AppDbContext>(builder.Configuration["ConnectionStrings:Default"]);
+builder.Services.AddSqlServer<AppDbContext>(
+  builder.Configuration["ConnectionStrings:Default"],
+  builder => builder.EnableRetryOnFailure()
+);
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(setupAction =>
 {
   setupAction.Password.RequireNonAlphanumeric = false;
@@ -55,7 +58,11 @@ string? tokenKeyString = builder.Configuration.GetSection("JwtBearerTokenSetting
 
 builder.Services.AddAuthorization(configure =>
 {
-
+  configure.AddPolicy("EmployeePolicy", configurePolicy=>
+    configurePolicy
+      .RequireAuthenticatedUser()
+      .RequireClaim("employeeRegistration")
+  );
 });
 builder.Services.AddAuthentication(defaultScheme =>
 {

@@ -70,7 +70,7 @@ public class EmployeeRepository : IEmployeeRepository
     };
   }
 
-  public RepositoryTaskResult UpdateEntity(Guid id, EmployeeDTO entity, string userId)
+  public RepositoryTaskResult UpdateEntity(Guid id, EmployeeUpdateDTO entity, string userId)
   {
     Employee? dbEntity = _context.Employees.Include(e => e.User).FirstOrDefault(c => c.Id == id);
     if (dbEntity == null)

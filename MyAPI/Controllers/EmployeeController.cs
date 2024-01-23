@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Entities;
 using MyAPI.Entities.Employees;
+using System.Security.Claims;
 
 namespace MyAPI.Controllers;
 
-[Authorize]
+[Authorize(Policy = "EmployeePolicy")]
 [ApiController]
 [Route("api/[controller]")]
 public class EmployeeController : ControllerBase
@@ -34,31 +35,44 @@ public class EmployeeController : ControllerBase
   [HttpPost("Add")]
   public IActionResult Add(EmployeeDTO entity)
   {
-    if(!entity.IsValid)
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+    if (!entity.IsValid)
     {
       return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
     }
-
-    var result = _repository.AddEntity(entity);
-
+    RepositoryTaskResult result = _repository.AddEntity(entity, userId);
     return result.Success ? Created() : BadRequest(result.Errors);
   }
 
   [HttpPut("UpdateById/{id:guid}")]
-  public IActionResult UpdateById(EmployeeDTO entity, Guid id)
+  public IActionResult UpdateById(EmployeeUpdateDTO entity, Guid id)
   {
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
     if (!entity.IsValid)
     {
       return BadRequest(entity.HandleErrors());
     }
-    var result = _repository.UpdateEntity(id, entity);
+    RepositoryTaskResult result = _repository.UpdateEntity(id, entity, userId);
     return result.Success ? Ok() : BadRequest(result.Errors);
   }
 
   [HttpPut("Activate/{id:guid}/{status:bool}")]
   public IActionResult Activate(Guid id, bool status)
   {
-    var result = _repository.ActivateEntity(id, status);
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+    RepositoryTaskResult result = _repository.ActivateEntity(id, status, userId);
     return result.Success ? Ok() : BadRequest(result.Errors);
   }
 

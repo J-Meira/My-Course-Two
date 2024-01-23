@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Entities;
 using MyAPI.Entities.Categories;
+using System.Net.NetworkInformation;
 using System.Security.Claims;
 
 namespace MyAPI.Controllers;
 
-[Authorize]
+[Authorize(Policy = "EmployeePolicy")]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoryController : ControllerBase
@@ -35,40 +36,57 @@ public class CategoryController : ControllerBase
   [HttpPost("Add")]
   public IActionResult Add(CategoryDTO entity)
   {
-    if (int.TryParse(this.User
-        .FindFirstValue("userId"), out int userId))
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
     {
-      if (!entity.IsValid)
-      {
-        return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
-      }
-      return _repository.AddEntity(entity) ? Created() : BadRequest();
+      return BadRequest(new ErrorsRDTO("User Not Found"));
     }
-    else
+    if (!entity.IsValid)
     {
-      return BadRequest();
+      return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
     }
+    RepositoryTaskResult result = _repository.AddEntity(entity, userId);
+    return  result.Success? Created() : BadRequest(result.Errors);
   }
 
   [HttpPut("UpdateById/{id:guid}")]
   public IActionResult UpdateById(CategoryDTO entity, Guid id)
   {
-    if(!entity.IsValid)
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+    if (!entity.IsValid)
     {
       return BadRequest(entity.HandleErrors());
     }
-    return _repository.UpdateEntity(id, entity) ? Ok() : BadRequest();
+    RepositoryTaskResult result = _repository.UpdateEntity(id, entity, userId);
+    return result.Success ? Ok() : BadRequest(result.Errors);
   }
 
   [HttpPut("Activate/{id:guid}/{status:bool}")]
   public IActionResult Activate(Guid id, bool status)
   {
-    return _repository.ActivateEntity(id, status) ? Ok() : BadRequest();
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+    RepositoryTaskResult result = _repository.ActivateEntity(id, status, userId);
+    return result.Success ? Ok() : BadRequest(result.Errors);
+
   }
 
   [HttpDelete("DeleteById/{id:guid}")]
   public IActionResult DeleteById(Guid id)
   {
-    return _repository.RemoveEntity(id) ? Ok() : BadRequest();
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+    RepositoryTaskResult result = _repository.RemoveEntity(id);
+    return result.Success ? Ok() : BadRequest(result.Errors);
   }
 }

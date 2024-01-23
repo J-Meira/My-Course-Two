@@ -30,7 +30,7 @@ public class CategoryRepository : ICategoryRepository
       Errors = null
     };
   }
-  public RepositoryTaskResult RemoveEntity(Guid id, string userId)
+  public RepositoryTaskResult RemoveEntity(Guid id)
   {
     Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
     if (dbEntity == null)
@@ -38,7 +38,7 @@ public class CategoryRepository : ICategoryRepository
       return new RepositoryTaskResult
       {
         Success = false,
-        Errors = new ErrorsRDTO(new List<string>(["Category nout found"]))
+        Errors = new ErrorsRDTO("Category nout found")
       };
     }
     _context.Categories.Remove(dbEntity);
@@ -59,10 +59,10 @@ public class CategoryRepository : ICategoryRepository
       return new RepositoryTaskResult
       {
         Success = false,
-        Errors = new ErrorsRDTO(new List<string>(["Category nout found"]))
+        Errors = new ErrorsRDTO("Category nout found")
       };
     }
-    dbEntity.Update(entity.Name, "Sys");
+    dbEntity.Update(entity.Name, userId);
 
     int resultSave = _context.SaveChanges();
 
@@ -96,7 +96,7 @@ public class CategoryRepository : ICategoryRepository
       return new RepositoryTaskResult
       {
         Success = false,
-        Errors = new ErrorsRDTO(new List<string>(["Category nout found"]))
+        Errors = new ErrorsRDTO("Category nout found")
       };
     }
     dbEntity.Activate(status, userId);
