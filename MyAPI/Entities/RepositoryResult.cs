@@ -1,6 +1,6 @@
 namespace MyAPI.Entities;
 
-public class RepositoryTaskResult
+public class RepositoryResult
 {
   public bool Success { get; set; }
   public ErrorsRDTO? Errors { get; set; }

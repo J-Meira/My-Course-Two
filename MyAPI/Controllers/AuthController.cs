@@ -26,14 +26,14 @@ public class AuthController : ControllerBase
 
   [AllowAnonymous]
   [HttpPost("SingIn")]
-  public IActionResult Add(SignInDTO entity)
+  public async Task<IActionResult> SingIn(SignInDTO entity)
   {
     if (!entity.IsValid)
     {
       return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
     }
 
-    IdentityUser? user = _userManager.FindByEmailAsync(entity.Email).Result;
+    IdentityUser? user = await _userManager.FindByEmailAsync(entity.Email);
     if (user == null)
     {
       return BadRequest(new ErrorsRDTO("Email or password are invalid"));
@@ -43,7 +43,7 @@ public class AuthController : ControllerBase
       return BadRequest(new ErrorsRDTO("Email or password are invalid"));
     }
 
-    EmployeeRDTO? employee = _repository.GetByUserId(user.Id);
+    EmployeeRDTO? employee = await _repository.GetByUserId(user.Id);
 
     if (employee == null || employee.Active == false)
     {
@@ -61,10 +61,15 @@ public class AuthController : ControllerBase
     string token = _authHelper
       .CreateToken(claims,expires);
 
-    return Ok(new
-    {
-      token = token,
-      expires = expires
-    });
+    return Ok(new SignInRDTO(
+      token,
+      expires,
+      new UserSignIn(
+        user.Id,
+        employee.Name,
+        employee.Registration      
+      )
+     )
+    );
   }
 }

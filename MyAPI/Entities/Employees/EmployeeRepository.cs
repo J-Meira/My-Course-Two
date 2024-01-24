@@ -32,7 +32,7 @@ public class EmployeeRepository : IEmployeeRepository
           options.MapFrom(source => source.Active));
     }));
   }
-  public RepositoryTaskResult AddEntity(EmployeeDTO entity, string userId)
+  public async Task<RepositoryResult> AddEntity(EmployeeDTO entity, string userId)
   {
     IdentityUser user = new IdentityUser
     {
@@ -40,11 +40,11 @@ public class EmployeeRepository : IEmployeeRepository
       Email = entity.Email,
     };
 
-    IdentityResult result = _userManager.CreateAsync(user, entity.Password).Result;
+    IdentityResult result = await _userManager.CreateAsync(user, entity.Password);
 
     if (!result.Succeeded)
     {
-      return new RepositoryTaskResult
+      return new RepositoryResult
       {
         Success = false,
         Errors = ArrangeIdentityErrors(result.Errors),
@@ -61,33 +61,33 @@ public class EmployeeRepository : IEmployeeRepository
       UpdatedBy = userId,
       UpdatedAt = DateTime.Now,
     };
-    _context.Employees.Add(Employee);
-    int resultEmployee = _context.SaveChanges();
+    await _context.Employees.AddAsync(Employee);
+    int resultEmployee = await _context.SaveChangesAsync();
 
-    return new RepositoryTaskResult {
+    return new RepositoryResult {
       Success= resultEmployee > 0,
       Errors= null
     };
   }
 
-  public RepositoryTaskResult UpdateEntity(Guid id, EmployeeUpdateDTO entity, string userId)
+  public async Task<RepositoryResult> UpdateEntity(Guid id, EmployeeUpdateDTO entity, string userId)
   {
-    Employee? dbEntity = _context.Employees.Include(e => e.User).FirstOrDefault(c => c.Id == id);
+    Employee? dbEntity = await _context.Employees.Include(e => e.User).FirstOrDefaultAsync(c => c.Id == id);
     if (dbEntity == null)
     {
-      return new RepositoryTaskResult
+      return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO(new List<string>(["Employee nout found"]))
+        Errors = new ErrorsRDTO("Employee nout found")
       };
     }
     if(dbEntity.User.Email != entity.Email)
     {
       //update email
-      IdentityResult setEmailResult = _userManager.SetEmailAsync(dbEntity.User, entity.Email).Result;
+      IdentityResult setEmailResult = await _userManager.SetEmailAsync(dbEntity.User, entity.Email);
       if (!setEmailResult.Succeeded)
       {
-        return new RepositoryTaskResult
+        return new RepositoryResult
         {
           Success = false,
           Errors = ArrangeIdentityErrors(setEmailResult.Errors),
@@ -96,33 +96,33 @@ public class EmployeeRepository : IEmployeeRepository
 
     }
     dbEntity.Update(entity.Name, entity.Registration, userId);
-    int resultEmployee = _context.SaveChanges();
+    int resultEmployee = await _context.SaveChangesAsync();
 
-    return new RepositoryTaskResult
+    return new RepositoryResult
     {
       Success = resultEmployee > 0,
       Errors = null
     };
   }
-  public EmployeeRDTO? GetById(Guid id)
+  public async Task<EmployeeRDTO?> GetById(Guid id)
   {
-    Employee? entity = _context.Employees
+    Employee? entity = await _context.Employees
       .Include(e=>e.User)
-      .Where(x => x.Id == id).FirstOrDefault();
+      .Where(x => x.Id == id).FirstOrDefaultAsync();
     return entity != null ? _rdtoMapper.Map<EmployeeRDTO>(
       entity
     ) : null;
   }
-  public EmployeeRDTO? GetByUserId(string userId)
+  public async Task<EmployeeRDTO?> GetByUserId(string userId)
   {
-    Employee? entity = _context.Employees
+    Employee? entity = await _context.Employees
       .Include(e=>e.User)
-      .Where(x => x.UserId == userId).FirstOrDefault();
+      .Where(x => x.UserId == userId).FirstOrDefaultAsync();
     return entity != null ? _rdtoMapper.Map<EmployeeRDTO>(
       entity
     ) : null;
   }
-  public IEnumerable<EmployeeRDTO> GetAll(int? limit, int? offset, string? searchTerm)
+  public async Task<IEnumerable<EmployeeRDTO>> GetAll(int? limit, int? offset, string? searchTerm)
   {
     var query = _context.Employees
       .Include(e => e.User)
@@ -142,28 +142,27 @@ public class EmployeeRepository : IEmployeeRepository
     if (limit != null)
     {
       query = query.Take(limit.Value);
-    }    
+    }
 
-
-    IEnumerable<Employee> list = query
-      .ToList();
+    IEnumerable<Employee> list = await query
+      .ToListAsync();
     return _rdtoMapper.Map<IEnumerable<EmployeeRDTO>>(list);
   }
-  public RepositoryTaskResult ActivateEntity(Guid id, bool status, string userId)
+  public async Task<RepositoryResult> ActivateEntity(Guid id, bool status, string userId)
   {
-    Employee? dbEntity = _context.Employees.FirstOrDefault(c => c.Id == id);
+    Employee? dbEntity = await _context.Employees.FirstOrDefaultAsync(c => c.Id == id);
     if (dbEntity == null)
     {
-      return new RepositoryTaskResult
+      return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO(new List<string>(["Employee nout found"]))
+        Errors = new ErrorsRDTO("Employee nout found")
       };
     }
     dbEntity.Activate(status, userId);
-    int resultEmployee = _context.SaveChanges();
+    int resultEmployee = await _context.SaveChangesAsync();
 
-    return new RepositoryTaskResult
+    return new RepositoryResult
     {
       Success = resultEmployee > 0,
       Errors = null

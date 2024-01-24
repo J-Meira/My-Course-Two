@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Entities;
 using MyAPI.Entities.Categories;
+using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Security.Claims;
 
@@ -21,20 +22,21 @@ public class CategoryController : ControllerBase
 
   [AllowAnonymous]
   [HttpGet("GetAll")]
-  public IEnumerable<CategoryRDTO> GetAll()
+  public async Task<IEnumerable<CategoryRDTO>> GetAll()
   {
-    return _repository.GetAll();
+    IEnumerable<CategoryRDTO> result = await _repository.GetAll();
+    return result;
   }
 
   [HttpGet("GetById/{id:guid}")]
-  public IActionResult GetById(Guid id)
+  public async Task<IActionResult> GetById(Guid id)
   {
-    CategoryRDTO ? category =  _repository.GetById(id);
+    CategoryRDTO ? category =  await _repository.GetById(id);
     return category == null ? BadRequest() : Ok(category);
   }
 
   [HttpPost("Add")]
-  public IActionResult Add(CategoryDTO entity)
+  public async Task<IActionResult> Add(CategoryDTO entity)
   {
     string? userId = this.User.FindFirstValue("userId");
     if (userId is null)
@@ -45,12 +47,12 @@ public class CategoryController : ControllerBase
     {
       return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
     }
-    RepositoryTaskResult result = _repository.AddEntity(entity, userId);
+    RepositoryResult result = await _repository.AddEntity(entity, userId);
     return  result.Success? Created() : BadRequest(result.Errors);
   }
 
   [HttpPut("UpdateById/{id:guid}")]
-  public IActionResult UpdateById(CategoryDTO entity, Guid id)
+  public async Task<IActionResult> UpdateById(CategoryDTO entity, Guid id)
   {
     string? userId = this.User.FindFirstValue("userId");
     if (userId is null)
@@ -61,32 +63,32 @@ public class CategoryController : ControllerBase
     {
       return BadRequest(entity.HandleErrors());
     }
-    RepositoryTaskResult result = _repository.UpdateEntity(id, entity, userId);
+    RepositoryResult result = await _repository.UpdateEntity(id, entity, userId);
     return result.Success ? Ok() : BadRequest(result.Errors);
   }
 
   [HttpPut("Activate/{id:guid}/{status:bool}")]
-  public IActionResult Activate(Guid id, bool status)
+  public async Task<IActionResult> Activate(Guid id, bool status)
   {
     string? userId = this.User.FindFirstValue("userId");
     if (userId is null)
     {
       return BadRequest(new ErrorsRDTO("User Not Found"));
     }
-    RepositoryTaskResult result = _repository.ActivateEntity(id, status, userId);
+    RepositoryResult result = await _repository.ActivateEntity(id, status, userId);
     return result.Success ? Ok() : BadRequest(result.Errors);
 
   }
 
   [HttpDelete("DeleteById/{id:guid}")]
-  public IActionResult DeleteById(Guid id)
+  public async Task<IActionResult> DeleteById(Guid id)
   {
     string? userId = this.User.FindFirstValue("userId");
     if (userId is null)
     {
       return BadRequest(new ErrorsRDTO("User Not Found"));
     }
-    RepositoryTaskResult result = _repository.RemoveEntity(id);
+    RepositoryResult result = await _repository.RemoveEntity(id);
     return result.Success ? Ok() : BadRequest(result.Errors);
   }
 }

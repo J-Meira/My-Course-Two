@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MyAPI.Infra.DataBase;
 
 namespace MyAPI.Entities.Categories;
@@ -10,7 +11,7 @@ public class CategoryRepository : ICategoryRepository
   {
     _context = context;
   }
-  public RepositoryTaskResult AddEntity(CategoryDTO entity, string userId)
+  public async Task<RepositoryResult> AddEntity(CategoryDTO entity, string userId)
   {
     Category category = new()
     {
@@ -20,22 +21,22 @@ public class CategoryRepository : ICategoryRepository
       UpdatedBy = userId,
       UpdatedAt = DateTime.Now,
     };
-    _context.Categories.Add(category);
+    await _context.Categories.AddAsync(category);
 
-    int resultSave = _context.SaveChanges();
+    int resultSave = await _context.SaveChangesAsync();
 
-    return new RepositoryTaskResult
+    return new RepositoryResult
     {
       Success = resultSave > 0,
       Errors = null
     };
   }
-  public RepositoryTaskResult RemoveEntity(Guid id)
+  public async Task<RepositoryResult> RemoveEntity(Guid id)
   {
-    Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
+    Category? dbEntity = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
     if (dbEntity == null)
     {
-      return new RepositoryTaskResult
+      return new RepositoryResult
       {
         Success = false,
         Errors = new ErrorsRDTO("Category nout found")
@@ -43,20 +44,20 @@ public class CategoryRepository : ICategoryRepository
     }
     _context.Categories.Remove(dbEntity);
 
-    int resultSave = _context.SaveChanges();
+    int resultSave = await _context.SaveChangesAsync();
 
-    return new RepositoryTaskResult
+    return new RepositoryResult
     {
       Success = resultSave > 0,
       Errors = null
     };
   }
-  public RepositoryTaskResult UpdateEntity(Guid id, CategoryDTO entity, string userId)
+  public async Task<RepositoryResult> UpdateEntity(Guid id, CategoryDTO entity, string userId)
   {
-    Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
+    Category? dbEntity = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
     if (dbEntity == null)
     {
-      return new RepositoryTaskResult
+      return new RepositoryResult
       {
         Success = false,
         Errors = new ErrorsRDTO("Category nout found")
@@ -64,17 +65,17 @@ public class CategoryRepository : ICategoryRepository
     }
     dbEntity.Update(entity.Name, userId);
 
-    int resultSave = _context.SaveChanges();
+    int resultSave = await _context.SaveChangesAsync();
 
-    return new RepositoryTaskResult
+    return new RepositoryResult
     {
       Success = resultSave > 0,
       Errors = null
     };
   }
-  public CategoryRDTO? GetById(Guid id)
+  public async Task<CategoryRDTO?> GetById(Guid id)
   {
-    Category? entity = _context.Categories.Where(x => x.Id == id).FirstOrDefault();
+    Category? entity = await _context.Categories.Where(x => x.Id == id).FirstOrDefaultAsync();
     return entity != null ? new CategoryRDTO()
     {
       Id = entity.Id,
@@ -83,26 +84,26 @@ public class CategoryRepository : ICategoryRepository
 
     } : null;
   }
-  public IEnumerable<CategoryRDTO> GetAll()
+  public async Task<IEnumerable<CategoryRDTO>> GetAll()
   {
-    IEnumerable<Category> list = _context.Categories.ToList();
+    IEnumerable<Category> list = await _context.Categories.ToListAsync();
     return list.Select(c => new CategoryRDTO { Id = c.Id, Name = c.Name, Active = c.Active });
   }
-  public RepositoryTaskResult ActivateEntity(Guid id, bool status, string userId)
+  public async Task<RepositoryResult> ActivateEntity(Guid id, bool status, string userId)
   {
-    Category? dbEntity = _context.Categories.FirstOrDefault(c => c.Id == id);
+    Category? dbEntity = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
     if (dbEntity == null)
     {
-      return new RepositoryTaskResult
+      return new RepositoryResult
       {
         Success = false,
         Errors = new ErrorsRDTO("Category nout found")
       };
     }
     dbEntity.Activate(status, userId);
-    int resultSave = _context.SaveChanges();
+    int resultSave = await _context.SaveChangesAsync();
 
-    return new RepositoryTaskResult
+    return new RepositoryResult
     {
       Success = resultSave > 0,
       Errors = null
