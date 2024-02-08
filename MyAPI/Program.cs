@@ -1,7 +1,24 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((builderContext, loggerConfiguration) =>
+{
+  loggerConfiguration
+    .WriteTo.MSSqlServer(
+    builderContext.Configuration["ConnectionStrings:Default"],
+      sinkOptions: new MSSqlServerSinkOptions()
+      {
+        AutoCreateSqlDatabase = true,
+        SchemaName = "MySchema",
+        TableName = "LogEvents",
+      }
+    )
+    .WriteTo.Console();
+});
 
 builder.Services.AddExceptionHandler<DefaultExceptionHandler>();
 builder.Services.AddExceptionHandler<DefaultExceptionHandler>();
@@ -10,6 +27,7 @@ builder.Services.AddSqlServer<AppDbContext>(
   builder.Configuration["ConnectionStrings:Default"],
   builder => builder.EnableRetryOnFailure()
 );
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(setupAction =>
 {
   setupAction.Password.RequireNonAlphanumeric = false;
@@ -20,9 +38,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(setupAction =>
 })
   .AddEntityFrameworkStores<AppDbContext>();
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(setup =>
 {
   // Include 'SecurityScheme' to use JWT Authentication

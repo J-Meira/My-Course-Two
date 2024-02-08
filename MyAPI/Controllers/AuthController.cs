@@ -5,15 +5,22 @@ namespace MyAPI.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-  private UserManager<IdentityUser> _userManager;
-  private IEmployeeRepository _repository;
   private readonly AuthHelper _authHelper;
+  private readonly ILogger<AuthController> _logger;
+  private IEmployeeRepository _repository;
+  private UserManager<IdentityUser> _userManager;
 
-  public AuthController(UserManager<IdentityUser> userManager, IEmployeeRepository repository, IConfiguration config)
+  public AuthController(
+    IConfiguration config,
+    ILogger<AuthController> logger,
+    IEmployeeRepository repository,
+    UserManager<IdentityUser> userManager
+    )
   {
-    _userManager = userManager;
-    _repository = repository;
     _authHelper = new AuthHelper(config);
+    _logger = logger;
+    _repository = repository;
+    _userManager = userManager;
   }
 
   [AllowAnonymous]
@@ -52,6 +59,8 @@ public class AuthController : ControllerBase
 
     string token = _authHelper
       .CreateToken(claims,expires);
+
+    _logger.LogInformation($"user sign in at: {DateTime.Now}");
 
     return Ok(new SignInRDTO(
       token,
