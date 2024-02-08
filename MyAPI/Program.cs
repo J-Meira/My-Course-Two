@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MyAPI.Entities.Categories;
-using MyAPI.Entities.Employees;
-using MyAPI.Infra.DataBase;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddExceptionHandler<DefaultExceptionHandler>();
+builder.Services.AddExceptionHandler<DefaultExceptionHandler>();
 
 builder.Services.AddSqlServer<AppDbContext>(
   builder.Configuration["ConnectionStrings:Default"],
@@ -101,5 +98,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseExceptionHandler(opt => { });
+
+app.MapGet("/Exception", () =>
+{
+  throw new NotImplementedException();
+}).ExcludeFromDescription(); ;
+
+app.MapGet("/Timeout", () => {
+  throw new TimeoutException();
+}).ExcludeFromDescription(); ;
+
 
 app.Run();
