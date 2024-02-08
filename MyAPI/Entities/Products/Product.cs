@@ -1,4 +1,3 @@
-using MyAPI.Entities.Categories;
 namespace MyAPI.Entities.Products;
 
 public partial class Product : Entity

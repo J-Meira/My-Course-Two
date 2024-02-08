@@ -1,11 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using MyAPI.Entities;
-using MyAPI.Entities.Employees;
-using System.Collections.Generic;
-using System.Security.Claims;
-
 namespace MyAPI.Controllers;
 
 [Authorize(Policy = "EmployeePolicy")]
@@ -34,7 +26,7 @@ public class EmployeeController : ControllerBase
     return record == null ? BadRequest() : Ok(record);
   }
 
-  [AllowAnonymous]
+  //[AllowAnonymous]
   [HttpPost("Add")]
   public async Task<IActionResult> Add(EmployeeDTO entity)
   {

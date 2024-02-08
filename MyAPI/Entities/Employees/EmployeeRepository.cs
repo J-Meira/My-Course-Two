@@ -1,9 +1,3 @@
-using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using MyAPI.Infra.DataBase;
-using System.Collections.Generic;
-
 namespace MyAPI.Entities.Employees;
 
 public class EmployeeRepository : IEmployeeRepository

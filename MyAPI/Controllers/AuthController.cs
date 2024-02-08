@@ -1,11 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using MyAPI.Entities.Employees;
-using MyAPI.Entities;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using MyAPI.Helpers;
-using Microsoft.AspNetCore.Authorization;
-
 namespace MyAPI.Controllers;
 
 [Authorize]

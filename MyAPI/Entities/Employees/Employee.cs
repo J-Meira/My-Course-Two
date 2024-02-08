@@ -1,6 +1,3 @@
-
-using Microsoft.AspNetCore.Identity;
-
 namespace MyAPI.Entities.Employees;
 
 public partial class Employee : Entity

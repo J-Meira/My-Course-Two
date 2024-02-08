@@ -1,11 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using MyAPI.Entities;
-using MyAPI.Entities.Categories;
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Security.Claims;
-
 namespace MyAPI.Controllers;
 
 [Authorize(Policy = "EmployeePolicy")]

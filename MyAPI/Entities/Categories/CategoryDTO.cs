@@ -1,5 +1,3 @@
-using Flunt.Validations;
-
 namespace MyAPI.Entities.Categories;
 
 public partial class CategoryDTO : EntityDTO

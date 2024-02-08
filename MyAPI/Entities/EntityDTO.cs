@@ -1,5 +1,3 @@
-using Flunt.Notifications;
-
 namespace MyAPI.Entities;
 
 public abstract class EntityDTO : Notifiable<Notification>

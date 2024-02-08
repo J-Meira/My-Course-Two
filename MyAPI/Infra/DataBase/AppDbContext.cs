@@ -1,11 +1,3 @@
-using Flunt.Notifications;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using MyAPI.Entities.Categories;
-using MyAPI.Entities.Employees;
-using MyAPI.Entities.Products;
-
 namespace MyAPI.Infra.DataBase;
 
 public class AppDbContext : IdentityDbContext<IdentityUser>

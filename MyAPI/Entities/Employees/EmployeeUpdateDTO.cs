@@ -1,6 +1,3 @@
-using Flunt.Validations;
-using MyAPI.Entities.Categories;
-
 namespace MyAPI.Entities.Employees;
 
 public class EmployeeUpdateDTO : EntityDTO

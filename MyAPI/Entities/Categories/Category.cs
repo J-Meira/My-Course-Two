@@ -1,4 +1,3 @@
-
 namespace MyAPI.Entities.Categories;
 
 public partial class Category : Entity

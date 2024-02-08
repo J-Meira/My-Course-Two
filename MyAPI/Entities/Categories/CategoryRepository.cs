@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using MyAPI.Infra.DataBase;
-
 namespace MyAPI.Entities.Categories;
 
 public class CategoryRepository : ICategoryRepository

@@ -8,6 +8,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="MyAPI.Entities" />
+    <Using Include="MyAPI.Entities.Categories" />
+    <Using Include="MyAPI.Entities.Employees" />
+    <Using Include="MyAPI.Entities.Products" />    
+    <Using Include="MyAPI.ErrorHandling" />
+    <Using Include="MyAPI.Infra.DataBase" />
+    <Using Include="MyAPI.Helpers" />
+
+    <Using Include="AutoMapper" />
+    <Using Include="Flunt.Notifications" />
+    <Using Include="Flunt.Validations" />
+    <Using Include="Microsoft.AspNetCore.Authorization" />
+    <Using Include="Microsoft.AspNetCore.Diagnostics" />
+    <Using Include="Microsoft.AspNetCore.Identity" />
+    <Using Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <Using Include="Microsoft.AspNetCore.Mvc" />
+    <Using Include="Microsoft.EntityFrameworkCore" />
+    <Using Include="Microsoft.IdentityModel.Tokens" />
+    <Using Include="System.IdentityModel.Tokens.Jwt" />
+    <Using Include="System.Security.Claims" />
+    <Using Include="System.Net" />
+    <Using Include="System.Text" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="automapper" Version="12.0.1" />
     <PackageReference Include="Flunt" Version="2.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
