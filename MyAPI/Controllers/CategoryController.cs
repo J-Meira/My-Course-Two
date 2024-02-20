@@ -14,10 +14,10 @@ public class CategoryController : ControllerBase
 
   [AllowAnonymous]
   [HttpGet("GetAll")]
-  public async Task<IEnumerable<CategoryRDTO>> GetAll()
+  public async Task<IActionResult> GetAll()
   {
     IEnumerable<CategoryRDTO> result = await _repository.GetAll();
-    return result;
+    return Ok(new GetAllRDTO<CategoryRDTO>(result.Count(), result));
   }
 
   [HttpGet("GetById/{id:guid}")]
