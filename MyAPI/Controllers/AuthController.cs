@@ -55,7 +55,7 @@ public class AuthController : ControllerBase
       new Claim("userName", employee.Name),
       new Claim("employeeRegistration", employee.Registration),
     };
-    DateTime expires = DateTime.UtcNow.AddDays(1);
+    DateTime expires = _authHelper.GetExpires(null);
 
     string token = _authHelper
       .CreateToken(claims,expires);

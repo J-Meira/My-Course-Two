@@ -34,4 +34,11 @@ public class AuthHelper(IConfiguration _config)
 
   }
 
+  public DateTime GetExpires (int ? hours)
+  {
+    var configHours = _config["JwtBearerTokenSettings:ExpiryTimeInHours"];
+    int expiresHours = int.Parse(configHours??"1");
+    return DateTime.UtcNow.AddHours(hours??expiresHours);
+  }
+
 }
