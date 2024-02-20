@@ -3,10 +3,21 @@ namespace MyAPI.Entities.Categories;
 public class CategoryRepository : ICategoryRepository
 {
   private readonly AppDbContext _context;
+  private IMapper _rdtoMapper;
 
   public CategoryRepository(AppDbContext context)
   {
     _context = context;
+    _rdtoMapper = new Mapper(new MapperConfiguration(cfg =>
+    {
+      cfg.CreateMap<Category, CategoryRDTO>()
+      .ForMember(destination => destination.Id, options =>
+          options.MapFrom(source => source.Id))
+      .ForMember(destination => destination.Name, options =>
+          options.MapFrom(source => source.Name))
+      .ForMember(destination => destination.Active, options =>
+          options.MapFrom(source => source.Active));
+    }));
   }
   public async Task<RepositoryResult> AddEntity(CategoryDTO entity, string userId)
   {
@@ -84,7 +95,7 @@ public class CategoryRepository : ICategoryRepository
   public async Task<IEnumerable<CategoryRDTO>> GetAll()
   {
     IEnumerable<Category> list = await _context.Categories.ToListAsync();
-    return list.Select(c => new CategoryRDTO { Id = c.Id, Name = c.Name, Active = c.Active });
+    return _rdtoMapper.Map<IEnumerable<CategoryRDTO>>(list);    
   }
   public async Task<RepositoryResult> ActivateEntity(Guid id, bool status, string userId)
   {
