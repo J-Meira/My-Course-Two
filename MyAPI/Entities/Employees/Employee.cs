@@ -7,8 +7,11 @@ public partial class Employee : Entity
   public string UserId { get; set; }
   public string Registration { get; set; }
 
-  public void Update(string name, string registration, string updatedBy)
-  {
+  public void Update(
+    string name,
+    string registration,
+    string updatedBy
+  ){
      Name = name;
      Registration = registration;
      UpdatedBy = updatedBy;
