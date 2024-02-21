@@ -7,5 +7,5 @@ public interface ICategoryRepository
   public Task<RepositoryResult> UpdateEntity(Guid id, CategoryDTO entity, string userId);
   public Task<RepositoryResult> ActivateEntity(Guid id, bool status, string userId);
   public Task<CategoryRDTO?> GetById(Guid id);
-  public Task<IEnumerable<CategoryRDTO>> GetAll();
+  public Task<GetAllRDTO<CategoryRDTO>> GetAll(bool showCase);
 }

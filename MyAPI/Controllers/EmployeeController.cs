@@ -15,8 +15,8 @@ public class EmployeeController : ControllerBase
   [HttpGet("GetAll")]
   public async Task<IActionResult> GetAll(int? limit, int? offset, string? searchTerm)
   {
-    IEnumerable<EmployeeRDTO> result = await _repository.GetAll(limit, offset, searchTerm);
-    return Ok(new GetAllRDTO<EmployeeRDTO>(result.Count(), result));
+    GetAllRDTO<EmployeeRDTO> result = await _repository.GetAll(limit, offset, searchTerm);
+    return Ok(result);
   }
 
   [HttpGet("GetById/{id:guid}")]

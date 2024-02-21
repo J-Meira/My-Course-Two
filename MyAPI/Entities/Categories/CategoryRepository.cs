@@ -83,7 +83,12 @@ public class CategoryRepository : ICategoryRepository
   }
   public async Task<CategoryRDTO?> GetById(Guid id)
   {
-    Category? entity = await _context.Categories.Where(x => x.Id == id).FirstOrDefaultAsync();
+    Category? entity = await _context
+      .Categories
+      .AsNoTracking()
+      .Where(x => x.Id == id)
+      .FirstOrDefaultAsync();
+
     return entity != null ? new CategoryRDTO()
     {
       Id = entity.Id,
@@ -92,11 +97,26 @@ public class CategoryRepository : ICategoryRepository
 
     } : null;
   }
-  public async Task<IEnumerable<CategoryRDTO>> GetAll()
+  public async Task<GetAllRDTO<CategoryRDTO>> GetAll(bool showCase)
   {
-    IEnumerable<Category> list = await _context.Categories.ToListAsync();
-    return _rdtoMapper.Map<IEnumerable<CategoryRDTO>>(list);    
+    var query = _context.Categories
+      .AsNoTracking()
+      .OrderBy(r => r.Name)
+      .AsQueryable();
+
+    if (showCase == true)
+    {
+      query = query.Where(r => r.Active);
+    }
+
+    IEnumerable<Category> list = await query.ToListAsync();
+
+    return new GetAllRDTO<CategoryRDTO>(
+      list.Count(),
+      _rdtoMapper.Map<IEnumerable<CategoryRDTO>>(list)
+    );    
   }
+
   public async Task<RepositoryResult> ActivateEntity(Guid id, bool status, string userId)
   {
     Category? dbEntity = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);

@@ -7,5 +7,5 @@ public interface IEmployeeRepository
   public Task<RepositoryResult> ActivateEntity(Guid id, bool status, string userId);
   public Task<EmployeeRDTO?> GetById(Guid id);
   public Task<EmployeeRDTO?> GetByUserId(string userId);
-  public Task<IEnumerable<EmployeeRDTO>> GetAll(int? limit, int? offset, string? searchTerm);
+  public Task<GetAllRDTO<EmployeeRDTO>> GetAll(int? limit, int? offset, string? searchTerm);
 }

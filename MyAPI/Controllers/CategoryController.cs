@@ -12,12 +12,11 @@ public class CategoryController : ControllerBase
     _repository = repository;
   }
 
-  [AllowAnonymous]
   [HttpGet("GetAll")]
   public async Task<IActionResult> GetAll()
   {
-    IEnumerable<CategoryRDTO> result = await _repository.GetAll();
-    return Ok(new GetAllRDTO<CategoryRDTO>(result.Count(), result));
+    GetAllRDTO<CategoryRDTO> result = await _repository.GetAll(false);
+    return Ok(result);
   }
 
   [HttpGet("GetById/{id:guid}")]

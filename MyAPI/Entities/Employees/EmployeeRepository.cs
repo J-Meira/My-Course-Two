@@ -55,6 +55,7 @@ public class EmployeeRepository : IEmployeeRepository
       UpdatedBy = userId,
       UpdatedAt = DateTime.Now,
     };
+
     await _context.Employees.AddAsync(Employee);
     int resultEmployee = await _context.SaveChangesAsync();
 
@@ -100,25 +101,34 @@ public class EmployeeRepository : IEmployeeRepository
   }
   public async Task<EmployeeRDTO?> GetById(Guid id)
   {
-    Employee? entity = await _context.Employees
+    Employee? entity = await _context
+      .Employees
+      .AsNoTracking()
       .Include(e=>e.User)
-      .Where(x => x.Id == id).FirstOrDefaultAsync();
+      .Where(x => x.Id == id)
+      .FirstOrDefaultAsync();
+
     return entity != null ? _rdtoMapper.Map<EmployeeRDTO>(
       entity
     ) : null;
   }
   public async Task<EmployeeRDTO?> GetByUserId(string userId)
   {
-    Employee? entity = await _context.Employees
+    Employee? entity = await _context
+      .Employees
+      .AsNoTracking()
       .Include(e=>e.User)
-      .Where(x => x.UserId == userId).FirstOrDefaultAsync();
+      .Where(x => x.UserId == userId)
+      .FirstOrDefaultAsync();
+
     return entity != null ? _rdtoMapper.Map<EmployeeRDTO>(
       entity
     ) : null;
   }
-  public async Task<IEnumerable<EmployeeRDTO>> GetAll(int? limit, int? offset, string? searchTerm)
+  public async Task<GetAllRDTO<EmployeeRDTO>> GetAll(int? limit, int? offset, string? searchTerm)
   {
     var query = _context.Employees
+      .AsNoTracking()
       .Include(e => e.User)
       .OrderBy(r => r.Name)
       .AsQueryable();
@@ -127,6 +137,7 @@ public class EmployeeRepository : IEmployeeRepository
     {
       query = query.Where(r=> r.Name.Contains(searchTerm) || r.User.Email.Contains(searchTerm));
     }
+    int count = await query.CountAsync();
 
     if (offset != null)
     {
@@ -140,7 +151,11 @@ public class EmployeeRepository : IEmployeeRepository
 
     IEnumerable<Employee> list = await query
       .ToListAsync();
-    return _rdtoMapper.Map<IEnumerable<EmployeeRDTO>>(list);
+
+    return new GetAllRDTO<EmployeeRDTO>(
+      count,
+      _rdtoMapper.Map<IEnumerable<EmployeeRDTO>>(list)
+    );
   }
   public async Task<RepositoryResult> ActivateEntity(Guid id, bool status, string userId)
   {
