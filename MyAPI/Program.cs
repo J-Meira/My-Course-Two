@@ -78,7 +78,13 @@ builder.Services.AddAuthorization(configure =>
       .RequireAuthenticatedUser()
       .RequireClaim("employeeRegistration")
   );
+  configure.AddPolicy("ClientPolicy", configurePolicy=>
+    configurePolicy
+      .RequireAuthenticatedUser()
+      .RequireClaim("nationalRegistrationNumber")
+  );
 });
+
 builder.Services.AddAuthentication(defaultScheme =>
 {
   defaultScheme.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
