@@ -189,14 +189,4 @@ public class EmployeeRepository : IEmployeeRepository
       Errors = null
     };
   }
-
-  private ErrorsRDTO ArrangeIdentityErrors(IEnumerable<IdentityError> errors)
-  {
-    List<string> list = new List<string>();
-    foreach (var error in errors)
-    {
-      list.Add(error.Description);
-    }
-    return new ErrorsRDTO(list);
-  }
 }
