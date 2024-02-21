@@ -47,7 +47,7 @@ public class EmployeeRepository : IEmployeeRepository
       };      
     }
 
-    Employee Employee = new ()
+    Employee employee = new ()
     {
       Name = entity.Name,
       Registration = entity.Registration,
@@ -58,7 +58,7 @@ public class EmployeeRepository : IEmployeeRepository
       UpdatedAt = DateTime.Now,
     };
 
-    await _context.Employees.AddAsync(Employee);
+    await _context.Employees.AddAsync(employee);
     int resultEmployee = await _context.SaveChangesAsync();
 
     return new RepositoryResult {
