@@ -6,10 +6,12 @@ public class EmployeeRepository : IEmployeeRepository
   private UserManager<IdentityUser> _userManager;
   private IMapper _rdtoMapper;
   //private IMapper _dtoMapper;
+  private IdentityHelper _identityHelper;
 
   public EmployeeRepository(AppDbContext context, UserManager<IdentityUser> userManager)
   {
     _context = context;
+    _identityHelper = new IdentityHelper();
     _userManager = userManager;
     _rdtoMapper = new Mapper(new MapperConfiguration(cfg =>
     {
@@ -41,7 +43,7 @@ public class EmployeeRepository : IEmployeeRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = ArrangeIdentityErrors(result.Errors),
+        Errors = _identityHelper.ArrangeErrors(result.Errors),
       };      
     }
 
@@ -85,7 +87,17 @@ public class EmployeeRepository : IEmployeeRepository
         return new RepositoryResult
         {
           Success = false,
-          Errors = ArrangeIdentityErrors(setEmailResult.Errors),
+          Errors = _identityHelper.ArrangeErrors(setEmailResult.Errors),
+        };
+      }
+
+      IdentityResult setUserNameResult = await _userManager.SetUserNameAsync(dbEntity.User, entity.Email);
+      if (!setUserNameResult.Succeeded)
+      {
+        return new RepositoryResult
+        {
+          Success = false,
+          Errors = _identityHelper.ArrangeErrors(setUserNameResult.Errors),
         };
       }
 
