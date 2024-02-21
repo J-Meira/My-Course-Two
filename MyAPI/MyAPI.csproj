@@ -10,6 +10,7 @@
   <ItemGroup>
     <Using Include="MyAPI.Entities" />
     <Using Include="MyAPI.Entities.Categories" />
+    <Using Include="MyAPI.Entities.Clients" />
     <Using Include="MyAPI.Entities.Employees" />
     <Using Include="MyAPI.Entities.Products" />    
     <Using Include="MyAPI.ErrorHandling" />
