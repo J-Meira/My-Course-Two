@@ -28,5 +28,8 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
     configurationBuilder
       .Properties<string>()
       .HaveMaxLength(100);
+    configurationBuilder
+      .Properties<decimal>()
+      .HaveColumnType("decimal(10,2)");
   }
 }
