@@ -26,7 +26,7 @@ public partial class ProductDTO : EntityDTO
 
   private void Validate()
   {
-    Contract<CategoryDTO> contract = new Contract<CategoryDTO>()
+    Contract<ProductDTO> contract = new Contract<ProductDTO>()
       .IsNotNullOrEmpty(Name, "Name")
       .IsGreaterOrEqualsThan(Name, 3, "Name")
       .IsNotNullOrEmpty(Description, "Description")

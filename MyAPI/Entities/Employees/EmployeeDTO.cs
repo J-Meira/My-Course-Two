@@ -18,7 +18,7 @@ public class EmployeeDTO : EntityDTO
 
   private void Validate()
   {
-    Contract<CategoryDTO> contract = new Contract<CategoryDTO>()
+    Contract<EmployeeDTO> contract = new Contract<EmployeeDTO>()
       .IsNotNullOrEmpty(Name, "Name")
       .IsGreaterOrEqualsThan(Name, 3, "Name")
       .IsNotNullOrEmpty(Email, "Email")
