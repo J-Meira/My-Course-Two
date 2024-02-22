@@ -40,7 +40,7 @@ public class ProductRepository : IProductRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Category nout found")
+        Errors = new ErrorsRDTO("Category not found")
       };
     }
 
@@ -49,7 +49,7 @@ public class ProductRepository : IProductRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Category isnt active")
+        Errors = new ErrorsRDTO("Category not active")
       };
     }
 
@@ -83,7 +83,7 @@ public class ProductRepository : IProductRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Product nout found")
+        Errors = new ErrorsRDTO("Product not found")
       };
     }
     _context.Products.Remove(dbEntity);
@@ -105,7 +105,7 @@ public class ProductRepository : IProductRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Product nout found")
+        Errors = new ErrorsRDTO("Product not found")
       };
     }
 
@@ -115,7 +115,7 @@ public class ProductRepository : IProductRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Category nout found")
+        Errors = new ErrorsRDTO("Category not found")
       };
     }
 
@@ -124,7 +124,7 @@ public class ProductRepository : IProductRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Category isnt active")
+        Errors = new ErrorsRDTO("Category not active")
       };
     }
 
@@ -241,7 +241,7 @@ public class ProductRepository : IProductRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Product nout found")
+        Errors = new ErrorsRDTO("Product not found")
       };
     }
     dbEntity.Activate(status, userId);

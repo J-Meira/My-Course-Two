@@ -5,11 +5,16 @@ namespace MyAPI.Controllers;
 [Route("api/[controller]")]
 public class MyAccountController : ControllerBase
 {
-  private IClientRepository _clientRepository;
+  private readonly IClientRepository _clientRepository;
+  private readonly IOrderRepository _orderRepository;
 
-  public MyAccountController(IClientRepository clientRepository)
+  public MyAccountController(
+    IClientRepository clientRepository,
+    IOrderRepository orderRepository
+  )
   {
     _clientRepository = clientRepository;
+    _orderRepository = orderRepository;
   }
 
   [AllowAnonymous]
@@ -55,6 +60,79 @@ public class MyAccountController : ControllerBase
     }
     RepositoryResult result = await _clientRepository.UpdateEntity(record.Id, entity, userId);
     return result.Success ? Ok() : BadRequest(result.Errors);
+  }
+
+  [HttpPost("CreateOrder")]
+  public async Task<IActionResult> CreateOrder(OrderDTO entity)
+  {
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+
+    if (!entity.IsValid)
+    {
+      return BadRequest(new ErrorsRDTO(entity.HandleErrors()));
+    }
+    RepositoryResult result = await _orderRepository.AddEntity(entity, userId);
+    return result.Success ? Created() : BadRequest(result.Errors);
+  }
+
+  [HttpGet("GetOrders")]
+  public async Task<IActionResult> GetOrders(
+    int? limit,
+    int? offset,
+    string orderBy = "createdAt",
+    bool desc = true
+  ){
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+
+    ClientRDTO? client = await _clientRepository.GetByUserId(userId);
+
+    if (client is null)
+    {
+      return BadRequest(new ErrorsRDTO("Client Not Found"));
+    }
+
+    if (limit > 100)
+    {
+      return BadRequest(new ErrorsRDTO("Limit should be less or equals than 100"));
+    }
+    if (orderBy != "client" && orderBy != "createdAt")
+    {
+      return BadRequest(new ErrorsRDTO("Order only is posible by 'client' or 'createdAt'"));
+    }
+
+    GetAllRDTO<OrderReportRDTO> result = await _orderRepository
+      .GetAll(limit, offset, client.Id, orderBy, desc);
+
+    return Ok(result);
+  }
+
+  [HttpGet("GetOrdersById/{id:guid}")]
+  public async Task<IActionResult> GetOrdersById(Guid id)
+  {
+    string? userId = this.User.FindFirstValue("userId");
+    if (userId is null)
+    {
+      return BadRequest(new ErrorsRDTO("User Not Found"));
+    }
+
+    ClientRDTO? client = await _clientRepository.GetByUserId(userId);
+
+    if (client is null)
+    {
+      return BadRequest(new ErrorsRDTO("Client Not Found"));
+    }
+
+    OrderRDTO? order = await _orderRepository.GetById(id);
+
+    return order == null || order.Client.Id != client.Id ? BadRequest() : Ok(order);
   }
 
 }

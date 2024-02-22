@@ -7,6 +7,7 @@ public partial class Product : Entity
   public Category Category { get; set; }  
   public bool HasStock { get; set; }
   public decimal Price { get; set; }
+  public ICollection<Order> Orders { get; set; }
 
   public void Update(
     string name,

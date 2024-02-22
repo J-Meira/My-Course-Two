@@ -75,7 +75,7 @@ public class EmployeeRepository : IEmployeeRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Employee nout found")
+        Errors = new ErrorsRDTO("Employee not found")
       };
     }
     if(dbEntity.User.Email != entity.Email)
@@ -177,7 +177,7 @@ public class EmployeeRepository : IEmployeeRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Employee nout found")
+        Errors = new ErrorsRDTO("Employee not found")
       };
     }
     dbEntity.Activate(status, userId);

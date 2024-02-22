@@ -47,7 +47,7 @@ public class CategoryRepository : ICategoryRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Category nout found")
+        Errors = new ErrorsRDTO("Category not found")
       };
     }
     _context.Categories.Remove(dbEntity);
@@ -68,7 +68,7 @@ public class CategoryRepository : ICategoryRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Category nout found")
+        Errors = new ErrorsRDTO("Category not found")
       };
     }
     dbEntity.Update(entity.Name, userId);
@@ -125,7 +125,7 @@ public class CategoryRepository : ICategoryRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Category nout found")
+        Errors = new ErrorsRDTO("Category not found")
       };
     }
     dbEntity.Activate(status, userId);

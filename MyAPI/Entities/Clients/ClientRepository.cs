@@ -75,7 +75,7 @@ public class ClientRepository : IClientRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Client nout found")
+        Errors = new ErrorsRDTO("Client not found")
       };
     }
     if(dbEntity.User.Email != entity.Email)
@@ -177,7 +177,7 @@ public class ClientRepository : IClientRepository
       return new RepositoryResult
       {
         Success = false,
-        Errors = new ErrorsRDTO("Client nout found")
+        Errors = new ErrorsRDTO("Client not found")
       };
     }
     dbEntity.Activate(status, userId);
