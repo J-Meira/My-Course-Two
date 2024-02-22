@@ -1,6 +1,6 @@
 namespace MyAPI.Controllers;
 
-[Authorize(Policy = "ClientPolicy")]
+[Authorize(Policy = "EmployeePolicy")]
 [ApiController]
 [Route("api/[controller]")]
 public class ClientController : ControllerBase
